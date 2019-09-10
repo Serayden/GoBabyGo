@@ -62,7 +62,7 @@ void loop() {
     lOut = map(yCont, yZero + yDeadZone, joyMin, 0, lMax); //Map speed in percent
     rOut = map(yCont, yZero + yDeadZone, joyMax, 0, rMax);
 
-    lSpeed = map(lOut, 100, 0, lRMin, lRMax);  //percent to analog movement
+    lSpeed = map(lOut, 0, 100, lRMin, lRMax);  //percent to analog movement
     rSpeed = map(rOut, 0, 100, rRMin, rRMax);
 
 
