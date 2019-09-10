@@ -1,4 +1,4 @@
-int xDeadZone = 13;  //joystick zero and deadzone
+int xDeadZone = 30;  //joystick zero and deadzone
 int xZero = 508;
 int yDeadZone = 30;
 int yZero = 508;
@@ -40,12 +40,12 @@ void loop() {
   int xCont = analogRead(A0);
 
   if (xCont > xZero) {  //turn right
-    rMax = map(xCont, xZero - xDeadZone, joyMin, 100, 0);
+    rMax = map(xCont, xZero + xDeadZone, joyMax, 100, 0);
     lMax = 100;
   }
 
   if (xCont <= xZero) {  //turn left
-    lMax = map(xCont, xZero + xDeadZone, joyMax, 100, 0);
+    lMax = map(xCont, xZero - xDeadZone, joyMin, 100, 0);
     rMax = 100;
   }
 
@@ -59,8 +59,8 @@ void loop() {
   }
 
   if (yCont < yZero - yDeadZone) {  //negative direction
-    lOut = map(yCont, yZero + yDeadZone, joyMin, 0, lMax); //Map speed in percent
-    rOut = map(yCont, yZero + yDeadZone, joyMax, 0, rMax);
+    lOut = map(yCont, yZero - yDeadZone, joyMin, 0, lMax); //Map speed in percent
+    rOut = map(yCont, yZero - yDeadZone, joyMin, 0, rMax);
 
     lSpeed = map(lOut, 0, 100, lRMin, lRMax);  //percent to analog movement
     rSpeed = map(rOut, 0, 100, rRMin, rRMax);
