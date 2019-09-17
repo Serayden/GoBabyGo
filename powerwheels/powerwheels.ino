@@ -1,20 +1,23 @@
-int xDeadZone = 30;  //joystick zero and deadzone
-int xZero = 508;
-int yDeadZone = 30;
-int yZero = 508;
-int joyMin = 0;
-int joyMax = 1023;
+// input constants
+#define xDeadZone = 30  //joystick zero and deadzone
+#define xZero = 508
+#define yDeadZone = 30
+#define yZero = 508
+#define joyMin = 0
+#define joyMax = 1023
 
-int lRMax = 122; //left motor max reverse
-int lRMin = 179; //left motor min reverse
-int lFMin = 197; //left forward min
-int lFMax = 254; //left forward max
+// motor limits
+#define lRMax = 122 //left motor max reverse
+#define lRMin = 179 //left motor min reverse
+#define lFMin = 197 //left forward min
+#define lFMax = 254 //left forward max
 
-int rRMax = 122; //right motor max reverse
-int rRMin = 179; //right motor min reverse
-int rFMin = 197; //right forward min
-int rFMax = 254; //right forward max
+#define rRMax = 122 //right motor max reverse
+#define rRMin = 179 //right motor min reverse
+#define rFMin = 197 //right forward min
+#define rFMax = 254 //right forward max
 
+// motor locations
 #define lMotor 3
 #define rMotor 5
 
@@ -36,21 +39,32 @@ void loop() {
   int lSpeed = 0; //motor speed in pwm
   int rSpeed = 0;
 
+  // get joystick values
   int yCont = analogRead(A1);
   int xCont = analogRead(A0);
 
-  if (xCont > xZero) {  //turn right
+  // if xCont is in the positive direction
+  if (xCont > xZero + xDeadZone) {  //turn right
+    // change the xCont value from a scale of the end of the joystick "deadzone" to joyMax
+    // to a scale of 0 to 100 (a power percent value)
+    // and set the max right motor speed to the new value
     rMax = map(xCont, xZero + xDeadZone, joyMax, 100, 0);
     lMax = 100;
   }
-
-  if (xCont <= xZero) {  //turn left
+  // if xCont is in the negative direction
+  if (xCont <= xZero - xDeadZone ) {  //turn left
+    // change the xCont value from a scale of joyMin to the start of the joystick "deadzone"
+    // to a scale of 0 to 100 (a power percent value)
+    // and set the max left motor speed to the new value
     lMax = map(xCont, xZero - xDeadZone, joyMin, 100, 0);
     rMax = 100;
   }
 
-
-  if (yCont > yZero + yDeadZone) {   //posative direction
+  // if yCont is in the positive direction
+  if (yCont > yZero + yDeadZone) {   // positive direction
+    // change the yCont value from a scale of the end of the "deadzone" to joyMax
+    // to a scale of 0 to the max value each size can have
+    // and set the power output percent to the new value
     lOut = map(yCont, yZero + yDeadZone, joyMax, 0, lMax); //Map speed in percent
     rOut = map(yCont, yZero + yDeadZone, joyMax, 0, rMax);
 
@@ -58,9 +72,13 @@ void loop() {
     rSpeed = map(rOut, 0, 100, rFMin, rFMax);
   }
 
+  // if yCont is in the negative direction
   if (yCont < yZero - yDeadZone) {  //negative direction
-    lOut = map(yCont, yZero - yDeadZone, joyMin, 0, lMax); //Map speed in percent
-    rOut = map(yCont, yZero - yDeadZone, joyMin, 0, rMax);
+    // change the yCont value from a scale of [yMin, beginning of "deadzone"]
+    // to a scale of 0 to the max value each size can have
+    // and set the power output percent to the new value
+    lOut = map(yCont, joyMin, yZero - yDeadZone, lMax, 0) * -1; //Map speed in percent
+    rOut = map(yCont, joyMin, yZero - yDeadZone, rMax, 0) * -1;
 
     lSpeed = map(lOut, 0, 100, lRMin, lRMax);  //percent to analog movement
     rSpeed = map(rOut, 0, 100, rRMin, rRMax);
