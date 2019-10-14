@@ -7,15 +7,15 @@
 #define joyMax = 1023
 
 // motor limits
-#define lRMax = 122 //left motor max reverse
-#define lRMin = 179 //left motor min reverse
-#define lFMin = 197 //left forward min
-#define lFMax = 254 //left forward max
+#define LEFT_REVERSE_MAX = 122 //left motor max reverse
+#define LEFT_REVERSE_MIN = 179 //left motor min reverse
+#define LEFT_FORWARD_MIN = 197 //left forward min
+#define LEFT_FORWARD_MAX = 254 //left forward max
 
-#define rRMax = 122 //right motor max reverse
-#define rRMin = 179 //right motor min reverse
-#define rFMin = 197 //right forward min
-#define rFMax = 254 //right forward max
+#define RIGHT_REVERSE_MAX = 122 //right motor max reverse
+#define RIGHT_REVERSE_MIN = 179 //right motor min reverse
+#define RIGHT_FORWARD_MIN = 197 //right forward min
+#define RIGHT_FORWARD_MAX = 254 //right forward max
 
 // motor locations
 #define lMotor 3
@@ -26,8 +26,6 @@ void setup() {
   Serial.begin(9600);
   pinMode(lMotor, OUTPUT);
   pinMode(rMotor, OUTPUT);
-
-
 }
 
 void loop() {
@@ -68,8 +66,10 @@ void loop() {
     lOut = map(yCont, yZero + yDeadZone, joyMax, 0, lMax); //Map speed in percent
     rOut = map(yCont, yZero + yDeadZone, joyMax, 0, rMax);
 
-    lSpeed = map(lOut, 0, 100, lFMin, lFMax);  //percent to analog movement
-    rSpeed = map(rOut, 0, 100, rFMin, rFMax);
+    // map left out from a scale of [0, 100] to a scale of [left forward min, left forward max] (power output)
+    // map right out from a scale of [0, 100] to a scale of [right forward min, right forward max] (power output)
+    lSpeed = map(lOut, 0, 100, LEFT_FORWARD_MIN, LEFT_FORWARD_MAX);  //percent to analog movement
+    rSpeed = map(rOut, 0, 100, RIGHT_FORWARD_MIN, RIGHT_FORWARD_MAX);
   }
 
   // if yCont is in the negative direction
@@ -80,23 +80,31 @@ void loop() {
     lOut = map(yCont, joyMin, yZero - yDeadZone, lMax, 0) * -1; //Map speed in percent
     rOut = map(yCont, joyMin, yZero - yDeadZone, rMax, 0) * -1;
 
-    lSpeed = map(lOut, 0, 100, lRMin, lRMax);  //percent to analog movement
-    rSpeed = map(rOut, 0, 100, rRMin, rRMax);
-
-
-
+    // map left out from a scale of [0, 100] to a scale of [left reverse min, left reverse max] (power output)
+    // map right out from a scale of [0, 100] to a scale of [right reverse min, right reverse max] (power output)
+    lSpeed = map(lOut, 0, 100, LEFT_REVERSE_MIN, LEFT_REVERSE_MAX);  //percent to analog movement
+    rSpeed = map(rOut, 0, 100, RIGHT_REVERSE_MIN, RIGHT_REVERSE_MAX);
   }
-  analogWrite(lMotor, lSpeed); //Write speed to motor
+
+  // write power outputs to the motors
+  analogWrite(lMotor, lSpeed); 
   analogWrite(rMotor, rSpeed);
 
-  Serial.print("input x:");
+  // lSpeed should be on the range [122, 254]
+  // rSpeed should be on the range [122, 254]
+
+  // debug stuff
+  Serial.print("Input x: ");
   Serial.print(xCont);
   Serial.print(" y: ");
   Serial.print(yCont);
-  Serial.print(" output lSpeed: ");
+  Serial.print(", Output Power Percent: Left: ");
   Serial.print(lOut);
-  Serial.print(" rSpeed: ");
+  Serial.print(" Right: ");
   Serial.print(rOut);
-  Serial.println("");
+  Serial.print(", Output Left Power: ");
+  Serial.print(lSpeed);
+  Serial.print(" Right Power: ");
+  Serial.println(rSpeed);
   //delay(00);
 }
