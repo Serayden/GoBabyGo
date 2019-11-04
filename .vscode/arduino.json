@@ -1,0 +1,6 @@
+{
+    "board": "arduino:avr:uno",
+    "port": "/dev/cu.usbmodem142101",
+    "sketch": "powerwheels/powerwheels.ino",
+    "programmer": "AVR ISP"
+}
